@@ -1,0 +1,16 @@
+[package]
+name = "kanji-trainer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+augurs-dtw = "0.10.1"
+kurbo = "0.13.0"
+lru = "0.16.2"
+lyon_geom = "1.0.18"
+nutype = "0.6.2"
+roxmltree = "0.21.1"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+svgtypes = "0.16.0"
+thiserror = "2.0.17"

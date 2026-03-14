@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>kanji-trainer-visualizer demo</title>
+    <style>
+      :root {
+        --page-bg: #f4f6fb;
+        --page-text: #1f232b;
+      }
+      body {
+        margin: 0;
+        padding: 16px;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        background: var(--page-bg);
+        color: var(--page-text);
+      }
+      .preview {
+        margin-bottom: 16px;
+      }
+      .toolbar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+      }
+      input[type="number"] {
+        width: 78px;
+      }
+      textarea {
+        width: 720px;
+        height: 480px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+      }
+      .editor {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-width: 720px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">
+      <label>
+        Visualizer theme
+        <select id="vizTheme">
+          <option value="light">light</option>
+          <option value="dark">dark</option>
+        </select>
+      </label>
+      <label>
+        Page background
+        <select id="pageTheme">
+          <option value="light">light</option>
+          <option value="dark">dark</option>
+        </select>
+      </label>
+      <label>
+        Width
+        <input id="panelWidth" type="number" min="640" max="2000" step="10" />
+      </label>
+      <label>
+        Height
+        <input id="panelHeight" type="number" min="360" max="1200" step="10" />
+      </label>
+      <button id="resizeBtn" type="button">Resize</button>
+    </div>
+    <div class="preview">
+      <div id="panelHost"></div>
+    </div>
+    <div class="editor">
+      <button id="applyBtn">Apply JSON</button>
+      <textarea id="jsonInput" placeholder="Paste GlobalValidationResult JSON here"></textarea>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kanji-trainer.dev/schemas/global-validation-result.schema.json",
+  "title": "GlobalValidationResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "is_valid",
+    "score",
+    "thresholds",
+    "reference_raw",
+    "user_raw",
+    "stroke_count",
+    "dtw",
+    "rms",
+    "composition",
+    "max_errors"
+  ],
+  "properties": {
+    "is_valid": { "type": "boolean" },
+    "score": { "$ref": "#/$defs/unitInterval" },
+    "thresholds": { "$ref": "#/$defs/ValidationThresholds" },
+    "reference_raw": { "$ref": "#/$defs/Kanji" },
+    "user_raw": { "$ref": "#/$defs/Kanji" },
+    "stroke_count": { "$ref": "#/$defs/StrokeCountResult" },
+    "dtw": { "$ref": "#/$defs/KanjiDirectionResult" },
+    "rms": { "$ref": "#/$defs/KanjiShapeResult" },
+    "composition": { "$ref": "#/$defs/KanjiCompositionResult" },
+    "max_errors": { "$ref": "#/$defs/GlobalErrors" }
+  },
+  "$defs": {
+    "unitInterval": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "index": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "Point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "$ref": "#/$defs/unitInterval" },
+        "y": { "$ref": "#/$defs/unitInterval" }
+      }
+    },
+    "Stroke": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["points", "label_pos"],
+      "properties": {
+        "points": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/Point" }
+        },
+        "label_pos": {
+          "anyOf": [
+            { "$ref": "#/$defs/Point" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "Kanji": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strokes"],
+      "properties": {
+        "strokes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/Stroke" }
+        }
+      }
+    },
+    "StrokeCountResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expected", "actual"],
+      "properties": {
+        "expected": { "$ref": "#/$defs/index" },
+        "actual": { "$ref": "#/$defs/index" }
+      }
+    },
+    "StrokeDirectionDetails": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dtw_error", "user_angles", "reference_angles"],
+      "properties": {
+        "dtw_error": { "$ref": "#/$defs/unitInterval" },
+        "user_angles": { "type": "array", "items": { "type": "number" } },
+        "reference_angles": { "type": "array", "items": { "type": "number" } }
+      }
+    },
+    "KanjiDirectionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strokes"],
+      "properties": {
+        "strokes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StrokeDirectionDetails" }
+        }
+      }
+    },
+    "StrokeShapeDetails": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rms", "user_points_normalized", "reference_points_normalized"],
+      "properties": {
+        "rms": { "$ref": "#/$defs/unitInterval" },
+        "user_points_normalized": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Point" }
+        },
+        "reference_points_normalized": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Point" }
+        }
+      }
+    },
+    "KanjiShapeResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["strokes"],
+      "properties": {
+        "strokes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StrokeShapeDetails" }
+        }
+      }
+    },
+    "Point2Array": {
+      "type": "array",
+      "prefixItems": [{ "type": "number" }, { "type": "number" }],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "PointDeviation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expected", "actual", "deviation_vector", "distance"],
+      "properties": {
+        "expected": { "$ref": "#/$defs/Point2Array" },
+        "actual": { "$ref": "#/$defs/Point2Array" },
+        "deviation_vector": { "$ref": "#/$defs/Point2Array" },
+        "distance": { "$ref": "#/$defs/unitInterval" }
+      }
+    },
+    "PointType": {
+      "type": "string",
+      "enum": ["Start", "End"]
+    },
+    "PointTypePair": {
+      "type": "array",
+      "prefixItems": [
+        { "$ref": "#/$defs/PointType" },
+        { "$ref": "#/$defs/PointType" }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "IndexPair": {
+      "type": "array",
+      "prefixItems": [
+        { "$ref": "#/$defs/index" },
+        { "$ref": "#/$defs/index" }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "AngleDeviation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stroke_indices",
+        "point_types",
+        "expected_angle",
+        "actual_angle",
+        "angle_diff",
+        "weight",
+        "weighted_diff"
+      ],
+      "properties": {
+        "stroke_indices": { "$ref": "#/$defs/IndexPair" },
+        "point_types": { "$ref": "#/$defs/PointTypePair" },
+        "expected_angle": { "type": "number" },
+        "actual_angle": { "type": "number" },
+        "angle_diff": { "$ref": "#/$defs/unitInterval" },
+        "weight": { "$ref": "#/$defs/unitInterval" },
+        "weighted_diff": { "$ref": "#/$defs/unitInterval" }
+      }
+    },
+    "StrokeRelativeDetails": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stroke_idx", "start", "end"],
+      "properties": {
+        "stroke_idx": { "$ref": "#/$defs/index" },
+        "start": { "$ref": "#/$defs/PointDeviation" },
+        "end": { "$ref": "#/$defs/PointDeviation" }
+      }
+    },
+    "AffineTransform": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scale_x", "scale_y", "translate_x", "translate_y"],
+      "properties": {
+        "scale_x": { "type": "number" },
+        "scale_y": { "type": "number" },
+        "translate_x": { "type": "number" },
+        "translate_y": { "type": "number" }
+      }
+    },
+    "CompositionAlignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["user_to_aligned", "reference_to_aligned"],
+      "properties": {
+        "user_to_aligned": { "$ref": "#/$defs/AffineTransform" },
+        "reference_to_aligned": { "$ref": "#/$defs/AffineTransform" }
+      }
+    },
+    "KanjiCompositionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stroke_details", "angle_details", "alignment"],
+      "properties": {
+        "stroke_details": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/StrokeRelativeDetails" }
+        },
+        "angle_details": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/AngleDeviation" }
+        },
+        "alignment": { "$ref": "#/$defs/CompositionAlignment" }
+      }
+    },
+    "GlobalErrors": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dtw", "rms", "position", "relative_angle"],
+      "properties": {
+        "dtw": { "$ref": "#/$defs/unitInterval" },
+        "rms": { "$ref": "#/$defs/unitInterval" },
+        "position": { "$ref": "#/$defs/unitInterval" },
+        "relative_angle": { "$ref": "#/$defs/unitInterval" }
+      }
+    },
+    "ValidationThresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dtw", "rms", "position", "relative_angle"],
+      "properties": {
+        "dtw": { "$ref": "#/$defs/unitInterval" },
+        "rms": { "$ref": "#/$defs/unitInterval" },
+        "position": { "$ref": "#/$defs/unitInterval" },
+        "relative_angle": { "$ref": "#/$defs/unitInterval" }
+      }
+    }
+  }
+}
