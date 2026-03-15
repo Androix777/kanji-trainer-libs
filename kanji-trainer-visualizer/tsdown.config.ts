@@ -9,6 +9,4 @@ export default defineConfig({
 	clean: true,
 	minify: true,
 	platform: "browser",
-	noExternal: ["animejs"],
-	inlineOnly: ["animejs"],
 });
