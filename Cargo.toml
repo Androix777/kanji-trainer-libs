@@ -4,3 +4,9 @@ members = [
     "python"
 ]
 resolver = "2"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
