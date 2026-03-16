@@ -1,0 +1,82 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    name: Build python on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+
+      - name: Sync Python environment with uv
+        working-directory: python
+        run: uv sync --group dev
+
+      - name: Build (Linux)
+        if: runner.os == 'Linux'
+        working-directory: python
+        run: uv run maturin build --release --compatibility manylinux_2_34
+
+      - name: Build (Windows/macOS)
+        if: runner.os != 'Linux'
+        working-directory: python
+        run: uv run maturin build --release
+
+      - name: Upload wheel
+        uses: actions/upload-artifact@v6
+        with:
+          name: wheels-${{ matrix.os }}
+          path: target/wheels/*.whl
+
+  build-visualizer:
+    name: Build Visualizer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: kanji-trainer-visualizer
+        run: npm install
+
+      - name: Build visualizer
+        working-directory: kanji-trainer-visualizer
+        run: npm run build
+
+      - name: Upload visualizer build
+        uses: actions/upload-artifact@v6
+        with:
+          name: kanji-trainer-visualizer-dist
+          path: kanji-trainer-visualizer/dist
+
